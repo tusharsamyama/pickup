@@ -23,18 +23,38 @@
   to { transform: rotate(360deg); }
 }
 
+.logo {
+  height:60px;
+  padding:15px;
+}
+
 .heading {
-  text-align: center;
+  background:#00897B;
+  min-height:50px;
+}
+
+.headPart {
+  height:80px;
+  display:inline-block;
+}
+.headPart img {
+  height:80px;
 }
 
 .actionBar {
-  padding:30px;
+  padding: 30px;
   text-align: center;
-  background: #eee;
+  background: #fff;
+  box-shadow: 0px 10px 10px #eee;
+  margin-bottom: 30px;
 }
 
 .actionBar input, .actionBar button {
   height:40px;
   margin-right:15px;
   font-size: 18px;
+}
+
+.canvasContainer {
+  text-align:center;
 }

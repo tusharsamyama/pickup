@@ -3,6 +3,22 @@ import axios from 'axios';
 import logo from './logo.svg';
 import './App.css';
 
+const rackList = [
+{x:1,y:1,size:10},
+{x:1,y:4,size:10},
+{x:1,y:5,size:10},
+{x:1,y:8,size:10},
+{x:1,y:9,size:10},
+{x:1,y:12,size:10},
+
+{x:13,y:1,size:10},
+{x:13,y:4,size:10},
+{x:13,y:5,size:10},
+{x:13,y:8,size:10},
+{x:13,y:9,size:10},
+{x:13,y:12,size:10},
+];
+
 class App extends Component {
   
   constructor(props) {
@@ -25,20 +41,38 @@ class App extends Component {
     this.clear = this.clear.bind(this);
   }
 
-  componentWillMount() {
-    this.setState({
-      racks : [
-        [{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1}],
-        [{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4}],
-        [{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5},{x:5,y:5}],
-        [{x:1,y:8},{x:2,y:8},{x:3,y:8},{x:4,y:8},{x:5,y:8}]
-      ]
-    });
-    axios.get('')
-  }
-
   componentDidMount() {
-    this.init();
+    const that = this;
+    let racks = [];
+    
+    racks = rackList.map((rack)=>{
+      const blocks = [];
+      for(var i = rack.x; i<rack.x + rack.size;i++){
+        blocks.push({ 
+          'x': i, 
+          'y': rack.y
+        });
+      }
+      return blocks;
+    });
+
+    axios.get('https://jsonplaceholder.typicode.com/users').then((result)=>{
+      that.setState({
+        racks : racks
+        // racks : [
+        //   [{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1}],
+        //   [{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4}],
+        //   [{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5},{x:5,y:5}],
+        //   [{x:1,y:8},{x:2,y:8},{x:3,y:8},{x:4,y:8},{x:5,y:8}],
+        //   [{x:11,y:1},{x:12,y:1},{x:13,y:1},{x:14,y:1},{x:15,y:1}],
+        //   [{x:11,y:4},{x:12,y:4},{x:13,y:4},{x:14,y:4},{x:15,y:4}],
+        //   [{x:11,y:5},{x:12,y:5},{x:13,y:5},{x:14,y:5},{x:15,y:5}],
+        //   [{x:11,y:8},{x:12,y:8},{x:13,y:8},{x:14,y:8},{x:15,y:8}]
+        // ]
+      });  
+    }).then(() => {
+      this.init();      
+    });
   }
 
   init() {
@@ -65,23 +99,21 @@ class App extends Component {
     const elemTop = c.offsetTop;
     const canvasX = e.pageX-elemLeft;
     const canvasY = e.pageY-elemTop;
-    const rackPosX = Math.floor(canvasX/50)*size;
-    const rackPosY = Math.floor(canvasY/50)*size;
+    const rackPosX = Math.floor(canvasX/size)*size;
+    const rackPosY = Math.floor(canvasY/size)*size;
     const hashVal = rackPosX+"_"+rackPosY;
     if(selected[hashVal]) {
       if(selected[hashVal].isSelected){
-        ctx.clearRect(rackPosX+1,rackPosY+1,size-4,size-18);
+        ctx.clearRect(rackPosX+2,rackPosY+2,size-4,size-4);
         const newCell = Object.assign({},selected[hashVal],{isSelected: false});
         this.setState({
           selected: Object.assign({},selected,{ [hashVal] : newCell })
         });
-      } else {
-        
+      } else {        
         ctx.beginPath();
         ctx.fillStyle = "green";
         ctx.arc(rackPosX+size/2,rackPosY+size/2,6,0,2*Math.PI);
         ctx.fill();
-
         const newCell = Object.assign({},selected[hashVal],{isSelected: true});
         this.setState({
           selected: Object.assign({},selected,{ [hashVal] : newCell })
@@ -99,8 +131,8 @@ class App extends Component {
         const xp = box.x*size;
         const yp = box.y*size;
         ctx.rect(box.x*size,box.y*size,size,size);
-        //ctx.font = "15px Arial";
-        //ctx.fillText(box.x+':'+box.y,box.x*size+5,box.y*size+(size - 5) );
+        ctx.font = "15px Arial";
+        ctx.fillText(box.x+':'+box.y,box.x*size+5,box.y*size+(size - 5) );
         const hashVal = xp+"_"+yp;
         hash[hashVal] = {x:xp,y:yp};
       })
@@ -152,16 +184,23 @@ class App extends Component {
   render() {
     return (
       <div>
-        <div className="heading"><h1>Shortest Pickup Path</h1></div>
+
+        <div className="heading">  
+          <div className="headPart">
+            <img className="logo" src="http://pharmeasy.in/dist/cba0bc934de5d4434a4a491af1a524bd.png" />
+          </div>
+        </div>
+        
         <div className="actionBar">
           <input placeholder="Enter order number" type="text" ref={(node) => { this.orderNo = node;}} />
           <button onClick={() => { this.drawPath() }}>Show</button>
           <button onClick={() => { this.clear() }}>Clear</button>
         </div>
 
-        <div>
-          <canvas id="myCanvas" width="1000" height="2000" style={{border:'1px solid #d3d3d3'}} />
+        <div className="canvasContainer">
+          <canvas id="myCanvas" width="1200" height="2000" style={{border:'1px solid #d3d3d3'}} />
         </div>
+
       </div>
     );
   }
