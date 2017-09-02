@@ -1,0 +1,40 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.heading {
+  text-align: center;
+}
+
+.actionBar {
+  padding:30px;
+  text-align: center;
+  background: #eee;
+}
+
+.actionBar input, .actionBar button {
+  height:40px;
+  margin-right:15px;
+  font-size: 18px;
+}
