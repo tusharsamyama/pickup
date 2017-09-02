@@ -101,8 +101,11 @@ class App extends Component {
     const elemTop = c.offsetTop;
     const canvasX = e.pageX-elemLeft;
     const canvasY = e.pageY-elemTop;
+    
     const rackPosX = Math.floor(canvasX/size)*size;
     const rackPosY = Math.floor(canvasY/size)*size;
+    console.log(rackPosX,rackPosY);
+
     const hashVal = rackPosX+"_"+rackPosY;
     if(selected[hashVal]) {
       if(selected[hashVal].isSelected){
@@ -137,7 +140,8 @@ class App extends Component {
   drawRect(ctx) {
     //alert('here..');
     ctx.lineWidth = 1;
-    const { size, racks, selected } = this.state, hash = {};    
+    const { size, racks, selected } = this.state, hash = {};
+
     racks.map((box)=>{
       const xp = box.x*size;
       const yp = box.y*size;
@@ -153,6 +157,7 @@ class App extends Component {
     });
 
     ctx.stroke();
+    console.log('>>>',hash);
   }
 
   drawPath() {
@@ -241,7 +246,7 @@ class App extends Component {
         </div>
 
         <div className="canvasContainer">
-          <canvas id="myCanvas" width="1500" height="1500" />
+          <canvas id="myCanvas" width="1500" height="2600" />
         </div>
 
       </div>

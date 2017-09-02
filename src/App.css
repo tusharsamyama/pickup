@@ -76,9 +76,6 @@ button:disabled {
 }
 
 .canvasContainer {
-  height:600px;
-  width:90%;
-  overflow: scroll;
   text-align:center;
   margin:0px auto;
   margin-bottom: 100px;
