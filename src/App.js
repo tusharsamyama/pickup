@@ -116,11 +116,11 @@ class App extends Component {
           e.id == selected[hashVal].id;
         });
 
-        const newSelectedRackIds = selectedRackIds.splice(idx,1);
+        selectedRackIds.splice(idx,1);
         
         this.setState({
           selected: Object.assign({},selected,{ [hashVal] : newCell }),
-          selectedRackIds: [...newSelectedRackIds]
+          selectedRackIds: [...selectedRackIds]
         });
 
       } else {        
