@@ -34,6 +34,7 @@ class App extends Component {
         [{x:1,y:8},{x:2,y:8},{x:3,y:8},{x:4,y:8},{x:5,y:8}]
       ]
     });
+    axios.get('')
   }
 
   componentDidMount() {
@@ -152,7 +153,6 @@ class App extends Component {
     return (
       <div>
         <div className="heading"><h1>Shortest Pickup Path</h1></div>
-        { JSON.stringify(this.state.selected) }
         <div className="actionBar">
           <input placeholder="Enter order number" type="text" ref={(node) => { this.orderNo = node;}} />
           <button onClick={() => { this.drawPath() }}>Show</button>
