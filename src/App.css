@@ -65,10 +65,12 @@ canvas {
   background: #6A1B9A;
   color:#fff;
   padding:0px 15px;
+  cursor: pointer;
 }
 
 button:disabled {
   background: #b5b5b5;
+  cursor: not-allowed;
 }
 
 .canvasContainer {

@@ -46,18 +46,28 @@ class App extends Component {
     const that = this;
     let racks = [];
     
-    racks = rackList.map((rack)=>{
-      const blocks = [];
-      for(var i = rack.x; i<rack.x + rack.size;i++){
-        blocks.push({ 
-          'x': i, 
-          'y': rack.y
-        });
-      }
-      return blocks;
-    });
+    // racks = rackList.map((rack)=>{
+    //   const blocks = [];
+    //   for(var i = rack.x; i<rack.x + rack.size;i++){
+    //     blocks.push({ 
+    //       'x': i, 
+    //       'y': rack.y
+    //     });
+    //   }
+    //   return blocks;
+    // });
 
-    axios.get('https://jsonplaceholder.typicode.com/users').then((result)=>{
+    axios.get('https://frozen-cove-59828.herokuapp.com/warehouse/path').then((result)=>{
+      const rackIds = Object.keys(result.data.racks);
+      const racks = rackIds.map((id) => {
+        const rack = result.data.racks[id];
+        return {
+          x: rack.x,
+          y: rack.y,
+          id: id
+        }
+      });
+
       that.setState({
         racks : racks
         // racks : [
@@ -105,7 +115,7 @@ class App extends Component {
     const hashVal = rackPosX+"_"+rackPosY;
     if(selected[hashVal]) {
       if(selected[hashVal].isSelected){
-        ctx.clearRect(rackPosX+2,rackPosY+2,size-4,size-4);
+        ctx.clearRect(rackPosX+2,rackPosY+2,size-4,size-20);
         const newCell = Object.assign({},selected[hashVal],{isSelected: false});
         this.setState({
           selected: Object.assign({},selected,{ [hashVal] : newCell })
@@ -127,16 +137,14 @@ class App extends Component {
     //alert('here..');
     ctx.lineWidth = 1;
     const { size, racks, selected } = this.state, hash = {};    
-    racks.map((rack)=>{
-      rack.map((box) => {
-        const xp = box.x*size;
-        const yp = box.y*size;
-        ctx.rect(box.x*size,box.y*size,size,size);
-        ctx.font = "15px Arial";
-        ctx.fillText(box.x+':'+box.y,box.x*size+5,box.y*size+(size - 5) );
-        const hashVal = xp+"_"+yp;
-        hash[hashVal] = {x:xp,y:yp};
-      })
+    racks.map((box)=>{
+      const xp = box.x*size;
+      const yp = box.y*size;
+      ctx.rect(box.x*size,box.y*size,size,size);
+      ctx.font = "15px Arial";
+      ctx.fillText(box.id,box.x*size+5,box.y*size+(size - 5) );
+      const hashVal = xp+"_"+yp;
+      hash[hashVal] = {x:xp,y:yp};
     });
 
     this.setState({
@@ -147,6 +155,11 @@ class App extends Component {
   }
 
   drawPath() {
+    
+    axios.get('https://frozen-cove-59828.herokuapp.com/warehouse/path?racks=3')
+    .then((result)=>{
+      console.log(result.data);
+    });
 
     const { path, ctx, size } = this.state;
     ctx.beginPath();
@@ -212,7 +225,7 @@ class App extends Component {
         </div>
 
         <div className="canvasContainer">
-          <canvas id="myCanvas" width="1400" height="1000" style={{border:'1px solid #000'}} />
+          <canvas id="myCanvas" width="" height="1000" style={{border:'1px solid #000'}} />
         </div>
 
       </div>
