@@ -25,6 +25,7 @@ class App extends Component {
     super(props);
     
     this.state = {
+      isClickable:true,
       size:50,
       elem:null,
       ctx:null,
@@ -88,12 +89,12 @@ class App extends Component {
   }
 
   clear() {
-    const { ctx } = this.state;
-    ctx.clearRect(0, 0, 500, 500);
-    setTimeout(this.drawRect(ctx),100);
+    window.location.reload();
   }
 
   clickHandler(e,c) {
+    if(!this.state.isClickable)
+      return;
     const { size, ctx, selected } = this.state;
     const elemLeft = c.offsetLeft;
     const elemTop = c.offsetTop;
@@ -124,7 +125,7 @@ class App extends Component {
 
   drawRect(ctx) {
     //alert('here..');
-
+    ctx.lineWidth = 1;
     const { size, racks, selected } = this.state, hash = {};    
     racks.map((rack)=>{
       rack.map((box) => {
@@ -149,7 +150,7 @@ class App extends Component {
 
     const { path, ctx, size } = this.state;
     ctx.beginPath();
-
+    ctx.lineWidth = 3;
     const points = path.map((pt)=>{
       return {
         x: (pt.x*size) + (size/2),
@@ -172,12 +173,9 @@ class App extends Component {
     }
     ctx.stroke();
 
-        
-    // for(var i = 0; i < points.length; i ++){
-    //   ctx.beginPath();
-    //   points[i].isPick && ctx.arc(points[i].x,points[i].y,10,0,2*Math.PI);
-    //   ctx.stroke();
-    // }
+    this.setState({
+      isClickable: false
+    })
 
   }
 
@@ -192,13 +190,29 @@ class App extends Component {
         </div>
         
         <div className="actionBar">
-          <input placeholder="Enter order number" type="text" ref={(node) => { this.orderNo = node;}} />
-          <button onClick={() => { this.drawPath() }}>Show</button>
-          <button onClick={() => { this.clear() }}>Clear</button>
+          
+          <input 
+            disabled={!this.state.isClickable} 
+            placeholder="Enter order number" 
+            type="text" 
+            ref={(node) => { this.orderNo = node;}} 
+          />
+
+          <button 
+            disabled={!this.state.isClickable} 
+            onClick={() => { this.drawPath() }}>
+            Show Path
+          </button>
+
+          <button 
+            disabled={this.state.isClickable} 
+            onClick={() => { this.clear() }}>
+            Next Order
+          </button>
         </div>
 
         <div className="canvasContainer">
-          <canvas id="myCanvas" width="1200" height="2000" style={{border:'1px solid #d3d3d3'}} />
+          <canvas id="myCanvas" width="1400" height="1000" style={{border:'1px solid #000'}} />
         </div>
 
       </div>
