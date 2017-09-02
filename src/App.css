@@ -45,12 +45,14 @@
   padding: 30px;
   text-align: center;
   background: #fff;
-  box-shadow: 0px 10px 10px #eee;
+  box-shadow: 0px 5px 10px #bbb;
   margin-bottom: 30px;
 }
 
-canvas {
-  background:#f9f9f9;
+
+
+.actionBar input {
+  border:1px solid #ccc;
 }
 
 .actionBar input, .actionBar button {
@@ -58,14 +60,14 @@ canvas {
   margin-right:15px;
   font-size: 15px;
   padding-left:5px;
-  border: none;
-  box-shadow: 3px 3px 5px #aaa;
 }
 .actionBar button {
+  border: none;
   background: #6A1B9A;
   color:#fff;
   padding:0px 15px;
   cursor: pointer;
+  box-shadow: 3px 3px 5px #aaa;
 }
 
 button:disabled {
@@ -74,10 +76,11 @@ button:disabled {
 }
 
 .canvasContainer {
-  height:500px;
-  width:1200px;
+  height:600px;
+  width:90%;
   overflow: scroll;
-  border:1px solid #999;
   text-align:center;
   margin:0px auto;
+  margin-bottom: 100px;
+  box-shadow: 0px 0px 30px #999;
 }

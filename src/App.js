@@ -30,9 +30,10 @@ class App extends Component {
       elem:null,
       ctx:null,
       selected:{},
+      selectedRackIds:[],
       orderNo:'',
       racks:[],
-      path:[{x:1,y:1,isPick:true},{x:1,y:3},{x:0,y:3},{x:0,y:6},{x:2,y:6},{x:2,y:5,isPick:true},{x:2,y:6},{x:5,y:6},{x:5,y:8,isPick:true}]
+      path:[]
     }
 
     this.init = this.init.bind(this);
@@ -70,16 +71,6 @@ class App extends Component {
 
       that.setState({
         racks : racks
-        // racks : [
-        //   [{x:1,y:1},{x:2,y:1},{x:3,y:1},{x:4,y:1},{x:5,y:1}],
-        //   [{x:1,y:4},{x:2,y:4},{x:3,y:4},{x:4,y:4},{x:5,y:4}],
-        //   [{x:1,y:5},{x:2,y:5},{x:3,y:5},{x:4,y:5},{x:5,y:5}],
-        //   [{x:1,y:8},{x:2,y:8},{x:3,y:8},{x:4,y:8},{x:5,y:8}],
-        //   [{x:11,y:1},{x:12,y:1},{x:13,y:1},{x:14,y:1},{x:15,y:1}],
-        //   [{x:11,y:4},{x:12,y:4},{x:13,y:4},{x:14,y:4},{x:15,y:4}],
-        //   [{x:11,y:5},{x:12,y:5},{x:13,y:5},{x:14,y:5},{x:15,y:5}],
-        //   [{x:11,y:8},{x:12,y:8},{x:13,y:8},{x:14,y:8},{x:15,y:8}]
-        // ]
       });  
     }).then(() => {
       this.init();      
@@ -105,7 +96,7 @@ class App extends Component {
   clickHandler(e,c) {
     if(!this.state.isClickable)
       return;
-    const { size, ctx, selected } = this.state;
+    const { size, ctx, selected, selectedRackIds } = this.state;
     const elemLeft = c.offsetLeft;
     const elemTop = c.offsetTop;
     const canvasX = e.pageX-elemLeft;
@@ -117,9 +108,18 @@ class App extends Component {
       if(selected[hashVal].isSelected){
         ctx.clearRect(rackPosX+2,rackPosY+2,size-4,size-20);
         const newCell = Object.assign({},selected[hashVal],{isSelected: false});
-        this.setState({
-          selected: Object.assign({},selected,{ [hashVal] : newCell })
+        
+        const idx = selectedRackIds.findIndex((e) => {
+          e.id == selected[hashVal].id;
         });
+
+        const newSelectedRackIds = selectedRackIds.splice(idx,1);
+        
+        this.setState({
+          selected: Object.assign({},selected,{ [hashVal] : newCell }),
+          selectedRackIds: [...newSelectedRackIds]
+        });
+
       } else {        
         ctx.beginPath();
         ctx.fillStyle = "green";
@@ -127,7 +127,8 @@ class App extends Component {
         ctx.fill();
         const newCell = Object.assign({},selected[hashVal],{isSelected: true});
         this.setState({
-          selected: Object.assign({},selected,{ [hashVal] : newCell })
+          selected: Object.assign({},selected,{ [hashVal] : newCell }),
+          selectedRackIds: [...selectedRackIds,selected[hashVal].id]
         });
       }
     }
@@ -144,7 +145,7 @@ class App extends Component {
       ctx.font = "15px Arial";
       ctx.fillText(box.id,box.x*size+5,box.y*size+(size - 5) );
       const hashVal = xp+"_"+yp;
-      hash[hashVal] = {x:xp,y:yp};
+      hash[hashVal] = {x:xp,y:yp,id:box.id};
     });
 
     this.setState({
@@ -155,47 +156,62 @@ class App extends Component {
   }
 
   drawPath() {
-    
-    axios.get('https://frozen-cove-59828.herokuapp.com/warehouse/path?racks=3')
+    const { selected, selectedRackIds } = this.state;
+    const that = this;
+    console.log('selectedRackIds',selectedRackIds);
+    const queryParams = selectedRackIds.map((id) => { return 'racks='+id }).join('&');
+    axios.get('https://frozen-cove-59828.herokuapp.com/warehouse/path?'+queryParams)
     .then((result)=>{
-      console.log(result.data);
-    });
+      console.log('result.data.path',result.data.path);
+      const { ctx, size } = that.state;
+      const path = result.data.path;
+      
+      ctx.lineWidth = 3;
+      const points = path.map((pt)=>{
+        return {
+          x: (pt.x*size) + (size/2),
+          y: (pt.y*size) + (size/2),
+          counter: pt.counter
+        }
+      });
 
-    const { path, ctx, size } = this.state;
-    ctx.beginPath();
-    ctx.lineWidth = 3;
-    const points = path.map((pt)=>{
-      return {
-        x: (pt.x*size) + (size/2),
-        y: (pt.y*size) + (size/2),
-        isPick: pt.isPick
+      ctx.beginPath();
+      ctx.moveTo((points[0].x), points[0].y);
+      for(var i = 0; i < points.length-1; i ++)
+      { 
+        var x_mid = (points[i].x + points[i+1].x) / 2;
+        var y_mid = (points[i].y + points[i+1].y) / 2;
+        var cp_x1 = (x_mid + points[i].x) / 2;
+        var cp_y1 = (y_mid + points[i].y) / 2;
+        var cp_x2 = (x_mid + points[i+1].x) / 2;
+        var cp_y2 = (y_mid + points[i+1].y) / 2;
+        ctx.quadraticCurveTo(cp_x1,points[i].y ,x_mid, y_mid);
+        ctx.quadraticCurveTo(cp_x2,points[i+1].y ,points[i+1].x,points[i+1].y);
+
+        if(points[i].counter) {
+          console.log('points[i]',points[i],points[i].x*size+2,points[i].y*size+2);
+          ctx.font = "15xpx Arial";
+          ctx.fillText(points[i].counter,points[i].x,points[i].y-7);
+        }
       }
+      ctx.stroke();
+      
+      this.setState({
+        isClickable: false
+      })
+
+      ctx.beginPath();
+      ctx.arc(points[0].x,points[0].y,6,0,2*Math.PI);
+      ctx.fillStyle = "red";
+      ctx.fill();
+      ctx.stroke();
+
     });
-    
-    ctx.moveTo((points[0].x), points[0].y);
-    for(var i = 0; i < points.length-1; i ++)
-    { 
-      var x_mid = (points[i].x + points[i+1].x) / 2;
-      var y_mid = (points[i].y + points[i+1].y) / 2;
-      var cp_x1 = (x_mid + points[i].x) / 2;
-      var cp_y1 = (y_mid + points[i].y) / 2;
-      var cp_x2 = (x_mid + points[i+1].x) / 2;
-      var cp_y2 = (y_mid + points[i+1].y) / 2;
-      ctx.quadraticCurveTo(cp_x1,points[i].y ,x_mid, y_mid);
-      ctx.quadraticCurveTo(cp_x2,points[i+1].y ,points[i+1].x,points[i+1].y);
-    }
-    ctx.stroke();
-
-    this.setState({
-      isClickable: false
-    })
-
   }
 
   render() {
     return (
       <div>
-
         <div className="heading">  
           <div className="headPart">
             <img className="logo" src="http://pharmeasy.in/dist/cba0bc934de5d4434a4a491af1a524bd.png" />
@@ -206,13 +222,13 @@ class App extends Component {
           
           <input 
             disabled={!this.state.isClickable} 
-            placeholder="Enter order number" 
+            placeholder="Enter order number .." 
             type="text" 
             ref={(node) => { this.orderNo = node;}} 
           />
 
           <button 
-            disabled={!this.state.isClickable} 
+            disabled={!this.state.isClickable || this.state.selectedRackIds.length < 2} 
             onClick={() => { this.drawPath() }}>
             Show Path
           </button>
@@ -225,7 +241,7 @@ class App extends Component {
         </div>
 
         <div className="canvasContainer">
-          <canvas id="myCanvas" width="" height="1000" style={{border:'1px solid #000'}} />
+          <canvas id="myCanvas" width="1500" height="1500" />
         </div>
 
       </div>
