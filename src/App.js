@@ -226,7 +226,7 @@ class App extends Component {
         <div className="actionBar">
 
           <button 
-            disabled={!this.state.isClickable || this.state.selectedRackIds.length < 2} 
+            disabled={!this.state.isClickable || this.state.selectedRackIds.length < 1} 
             onClick={() => { this.drawPath() }}>
             Show Path
           </button>
