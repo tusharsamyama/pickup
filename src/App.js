@@ -113,10 +113,13 @@ class App extends Component {
         const newCell = Object.assign({},selected[hashVal],{isSelected: false});
         
         const idx = selectedRackIds.findIndex((e) => {
-          e.id == selected[hashVal].id;
+          //console.log('e.id=selected[hashVal].id',e,selected[hashVal].id);
+          return e == selected[hashVal].id;
         });
 
+        //console.log('selectedRackIds',selectedRackIds);
         selectedRackIds.splice(idx,1);
+        //console.log('idx',idx);
         
         this.setState({
           selected: Object.assign({},selected,{ [hashVal] : newCell }),
@@ -129,6 +132,7 @@ class App extends Component {
         ctx.arc(rackPosX+size/2,rackPosY+size/2,6,0,2*Math.PI);
         ctx.fill();
         const newCell = Object.assign({},selected[hashVal],{isSelected: true});
+        //console.log([...selectedRackIds,selected[hashVal].id]);
         this.setState({
           selected: Object.assign({},selected,{ [hashVal] : newCell }),
           selectedRackIds: [...selectedRackIds,selected[hashVal].id]
