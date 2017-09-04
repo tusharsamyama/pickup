@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import logo from './logo.svg';
+import logo from './mario.svg';
 import './App.css';
 
 const rackList = [
@@ -41,6 +41,7 @@ class App extends Component {
     this.drawPath = this.drawPath.bind(this);
     this.clickHandler = this.clickHandler.bind(this);
     this.clear = this.clear.bind(this);
+    this.moveMario = this.moveMario.bind(this);
   }
 
   componentDidMount() {
@@ -141,6 +142,20 @@ class App extends Component {
     }
   }
 
+  moveMario(points) {
+    var c = document.getElementById("myCanvas");
+    const elemLeft = Number(c.offsetLeft) - 30;
+    const elemTop = Number(c.offsetTop) - 55;
+    points.map((pt,idx)=>{
+      const str = "translate("+(Number(pt.x) + elemLeft)+"px,"+(Number(pt.y)+elemTop)+"px)"; 
+      console.log(str);     
+      setTimeout(() => {
+        document.getElementById("mario").style.transform = str;
+      },250*idx);
+
+    })
+  }
+
   drawRect(ctx) {
     //alert('here..');
     ctx.lineWidth = 1;
@@ -215,12 +230,24 @@ class App extends Component {
       ctx.fill();
       ctx.stroke();
 
+      return points;
+    })
+    .then((points)=>{
+      console.log('>>>',points);
+      this.moveMario(points);
     });
   }
 
   render() {
     return (
       <div>
+        
+        {!this.state.isClickable &&
+          <div id="mario">
+            <img height="60" src={logo} />
+          </div>
+        }
+
         <div className="heading">  
           <div className="headPart">
             <img className="logo" src="http://pharmeasy.in/dist/cba0bc934de5d4434a4a491af1a524bd.png" />
