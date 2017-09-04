@@ -104,7 +104,7 @@ class App extends Component {
     
     const rackPosX = Math.floor(canvasX/size)*size;
     const rackPosY = Math.floor(canvasY/size)*size;
-    console.log(rackPosX,rackPosY);
+    //console.log(rackPosX,rackPosY);
 
     const hashVal = rackPosX+"_"+rackPosY;
     if(selected[hashVal]) {
@@ -157,17 +157,17 @@ class App extends Component {
     });
 
     ctx.stroke();
-    console.log('>>>',hash);
+    //console.log('>>>',hash);
   }
 
   drawPath() {
     const { selected, selectedRackIds } = this.state;
     const that = this;
-    console.log('selectedRackIds',selectedRackIds);
+    //console.log('selectedRackIds',selectedRackIds);
     const queryParams = selectedRackIds.map((id) => { return 'racks='+id }).join('&');
     axios.get('https://frozen-cove-59828.herokuapp.com/warehouse/path?'+queryParams)
     .then((result)=>{
-      console.log('result.data.path',result.data.path);
+      //console.log('result.data.path',result.data.path);
       const { ctx, size } = that.state;
       const path = result.data.path;
       
@@ -194,7 +194,7 @@ class App extends Component {
         ctx.quadraticCurveTo(cp_x2,points[i+1].y ,points[i+1].x,points[i+1].y);
 
         if(points[i].counter) {
-          console.log('points[i]',points[i],points[i].x*size+2,points[i].y*size+2);
+          //console.log('points[i]',points[i],points[i].x*size+2,points[i].y*size+2);
           ctx.font = "15xpx Arial";
           ctx.fillText(points[i].counter,points[i].x,points[i].y-7);
         }
@@ -224,13 +224,6 @@ class App extends Component {
         </div>
         
         <div className="actionBar">
-          
-          <input 
-            disabled={!this.state.isClickable} 
-            placeholder="Enter order number .." 
-            type="text" 
-            ref={(node) => { this.orderNo = node;}} 
-          />
 
           <button 
             disabled={!this.state.isClickable || this.state.selectedRackIds.length < 2} 
