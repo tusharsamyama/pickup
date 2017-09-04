@@ -251,6 +251,7 @@ class App extends Component {
         <div className="heading">  
           <div className="headPart">
             <img className="logo" src="http://pharmeasy.in/dist/cba0bc934de5d4434a4a491af1a524bd.png" />
+            <span className="marioName">Super Mario</span>
           </div>
         </div>
         
